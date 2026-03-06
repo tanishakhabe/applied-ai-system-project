@@ -19,6 +19,10 @@ One bug I noticed was that the user could input guesses outside of the number ra
 - Give one example of an AI suggestion that was correct (including what the AI suggested and how you verified the result).
 - Give one example of an AI suggestion that was incorrect or misleading (including what the AI suggested and how you verified the result).
 
+I mostly used Copilot on this project, and ChatGPT for other questions (ex. remembering Git CLI commands). One example of an AI suggestion that was correct was handling out of bounds guesses in the parse_guess function in the logic_utils.py. The AI suggested adding min_val and max_val arguments to the function, and within the function it added a check to see if the guess was between the min_val and max_val bounds, otherwise throw a warning. I verified the result in my test case by testing values 1 below the min_val and 1 above the max_val. 
+
+One AI suggestion that was incorrect was adjusting the number ranges for the "Normal" and "Hard" levels. I wanted to swap the original ranges such that Normal would be from 1-50 and Hard would be from 1-100. But after I made this fix, the AI assistant kept getting confused and trying to revert the change. In the end, I just ignored that specific suggested edit from Copilot. 
+
 ---
 
 ## 3. Debugging and testing your fixes
@@ -27,6 +31,10 @@ One bug I noticed was that the user could input guesses outside of the number ra
 - Describe at least one test you ran (manual or using pytest)  
   and what it showed you about your code.
 - Did AI help you design or understand any tests? How?
+
+For example, to test the inputs out of the range, I create a simple pytest. I also tried a few manual values, especially extreme positive and negative values (ex. -10000000, 10000000, etc.). However when trying these guesses, something I realized about my code was that I was unsure how it was handling decimals (ex. 40.3). I then asked Copilot to explain how this functionality was being handled, and suggestions to handle non-integer inputs. 
+
+Using AI streamlined the manual process of creating small unit tests. Sometimes, I would also experiment with manual tests, discover new bugs, and use the AI to understand intended functionality and debug. 
 
 ---
 

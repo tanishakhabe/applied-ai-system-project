@@ -24,11 +24,12 @@ def parse_guess(raw: str, min_val: int = None, max_val: int = None):
     if raw == "":
         return False, None, "Enter a guess."
 
+    # FIX: Added validation to reject decimal numbers, ensuring that only whole number guesses are accepted. This prevents confusion and maintains the integrity of the guessing game, which is designed around integer values.
+    if "." in raw:
+        return False, None, "Only whole numbers are allowed."
+
     try:
-        if "." in raw:
-            value = int(float(raw))
-        else:
-            value = int(raw)
+        value = int(raw)
     except Exception:
         return False, None, "That is not a number."
     

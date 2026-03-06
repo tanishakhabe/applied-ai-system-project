@@ -32,3 +32,10 @@ def test_parse_guess_rejects_out_of_range_for_difficulty(difficulty):
     assert above_ok is False
     assert above_value is None
     assert above_error == f"Guess must be between {min_val} and {max_val}."
+
+# FIX: Add tests for parse_guess to ensure it correctly rejects decimal inputs, which are not valid guesses in the game. This test verifies that the function returns an appropriate error message when a decimal number is provided.
+def test_parse_guess_rejects_decimal_input():
+    ok, value, error = parse_guess("3.14", 1, 100)
+    assert ok is False
+    assert value is None
+    assert error == "Only whole numbers are allowed." 
