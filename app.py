@@ -1,6 +1,11 @@
 import random
 import streamlit as st
-from logic_utils import get_range_for_difficulty, parse_guess, check_guess
+from logic_utils import (
+    get_range_for_difficulty,
+    parse_guess,
+    check_guess,
+    get_guess_closeness,
+)
 
 
 def update_score(current_score: int, outcome: str, attempt_number: int):
@@ -51,7 +56,7 @@ if "secret" not in st.session_state:
     st.session_state.secret = random.randint(low, high)
 
 if "attempts" not in st.session_state:
-    st.session_state.attempts = 1
+    st.session_state.attempts = 0
 
 if "score" not in st.session_state:
     st.session_state.score = 0
@@ -62,13 +67,17 @@ if "status" not in st.session_state:
 if "history" not in st.session_state:
     st.session_state.history = []
 
+if "guess_history" not in st.session_state:
+    st.session_state.guess_history = []
+
 # FIX: Ensure the secret number always matches the active difficulty range, and reset game state if it doesn't. This prevents issues when switching difficulties mid-game.
 # Ensure the current secret always matches the active difficulty range.
 if st.session_state.secret < low or st.session_state.secret > high:
     st.session_state.secret = random.randint(low, high)
-    st.session_state.attempts = 1
+    st.session_state.attempts = 0
     st.session_state.status = "playing"
     st.session_state.history = []
+    st.session_state.guess_history = []
 
 st.subheader("Make a guess")
 
@@ -90,6 +99,26 @@ raw_guess = st.text_input(
     key=f"guess_input_{difficulty}"
 )
 
+st.subheader("Guess History")
+if not st.session_state.guess_history:
+    st.caption("No guesses yet. Submit one to see how close you are.")
+else:
+    for entry in reversed(st.session_state.guess_history):
+        if not entry["valid"]:
+            st.markdown(
+                f"**Attempt {entry['attempt']}** - `{entry['guess']}`"
+            )
+            st.caption(f"Invalid guess: {entry['error']}")
+            continue
+
+        st.markdown(
+            f"**Attempt {entry['attempt']}** - Guess `{entry['guess']}`"
+        )
+        st.caption(
+            f"{entry['closeness_label']} ({entry['closeness_pct']}% close)"
+        )
+        st.progress(entry["closeness_pct"] / 100)
+
 col1, col2, col3 = st.columns(3)
 with col1:
     submit = st.button("Submit Guess 🚀")
@@ -101,6 +130,9 @@ with col3:
 if new_game:
     st.session_state.attempts = 0
     st.session_state.secret = random.randint(low, high)
+    st.session_state.status = "playing"
+    st.session_state.history = []
+    st.session_state.guess_history = []
     st.success("New game started.")
     st.rerun()
 
@@ -118,6 +150,14 @@ if submit:
 
     if not ok:
         st.session_state.history.append(raw_guess)
+        st.session_state.guess_history.append(
+            {
+                "attempt": st.session_state.attempts,
+                "guess": raw_guess,
+                "valid": False,
+                "error": err,
+            }
+        )
         st.error(err)
     else:
         st.session_state.history.append(guess_int)
@@ -125,6 +165,24 @@ if submit:
         secret = st.session_state.secret
 
         outcome = check_guess(guess_int, secret)
+        closeness_label, closeness_pct = get_guess_closeness(
+            guess_int,
+            secret,
+            low,
+            high,
+        )
+
+        st.session_state.guess_history.append(
+            {
+                "attempt": st.session_state.attempts,
+                "guess": guess_int,
+                "valid": True,
+                "outcome": outcome,
+                "distance": abs(guess_int - secret),
+                "closeness_label": closeness_label,
+                "closeness_pct": closeness_pct,
+            }
+        )
 
         # FIX: Flipped "Too High" and "Too Low" messages to match correct logic. 
         message_map = {

@@ -26,13 +26,23 @@ It wrote the code, ran away, and now the game is unplayable.
 ## 📝 Document Your Experience
 
 - [ ] Describe the game's purpose.
+This is a number guessing game with three levels, early, normal, and hard. To play the game, users can enter any whole number within the guessing range, with a certain number of attempts allowed. The user also has the option to see hints to guide them towards the secret number. The app also has a "Guess History" sidebar that visualizes how close your previous guesses were to the secret number.
+
 - [ ] Detail which bugs you found.
+The first bug I found was the the user input was allowing numbers outside of the guessing range, negative numbers, as well as decimal values. Another bug that I found was that when you changed game levels, the number ranges would not match the difficulty of the level. Another bug I found was that the hints were not accurate to the guesses that were inputted. 
+
+
 - [ ] Explain what fixes you applied.
+I changed the game level ranges to make them match the level of difficulty by making the size of the number range increase as you went from easy, to normal, to hard. I fixed the allowed values for the guess values by applying constraints/checks on the user inputs. I also updated the function logic to give the correct hints by comparing the user input and and secret number after each guess. 
+
 
 ## 📸 Demo
 
 - [ ] [Insert a screenshot of your fixed, winning game here]
+![alt text](final_app.png)
 
 ## 🚀 Stretch Features
 
 - [ ] [If you choose to complete Challenge 4, insert a screenshot of your Enhanced Game UI here]
+
+I chose to complete Challenge 2 by adding a Guess History visualization at the bottom of the page. First I basically detailed the feature description and what I wanted the visual to look like, and then had the agent suggest the changes to my code. I iterated on the process by reviewing and accepting the code changes, then running the app and experimenting with different inputs to see how the visualization looked and if there were any bugs. I did run into some bugs initially, for example, it was displaying the wrong Attempt Number. I fixed this problem by pointing it out in the Copilot Chat and asking it to walk through and inspect the function that was handling that logic.

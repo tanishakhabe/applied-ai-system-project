@@ -1,6 +1,11 @@
 import pytest
 
-from logic_utils import check_guess, get_range_for_difficulty, parse_guess
+from logic_utils import (
+    check_guess,
+    get_guess_closeness,
+    get_range_for_difficulty,
+    parse_guess,
+)
 
 def test_winning_guess():
     # If the secret is 50 and guess is 50, it should be a win
@@ -39,3 +44,21 @@ def test_parse_guess_rejects_decimal_input():
     assert ok is False
     assert value is None
     assert error == "Only whole numbers are allowed." 
+
+
+def test_get_guess_closeness_exact():
+    label, pct = get_guess_closeness(25, 25, 1, 50)
+    assert label == "Exact"
+    assert pct == 100
+
+
+def test_get_guess_closeness_far_guess_is_cold():
+    label, pct = get_guess_closeness(1, 50, 1, 50)
+    assert label == "Cold"
+    assert pct < 10
+
+
+def test_get_guess_closeness_near_guess_is_hot_or_warm():
+    label, pct = get_guess_closeness(48, 50, 1, 50)
+    assert label in {"Very Hot", "Warm"}
+    assert pct > 90

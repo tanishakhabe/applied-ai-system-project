@@ -61,6 +61,31 @@ def check_guess(guess, secret):
         return "Too Low"
 
 
+def get_guess_closeness(guess: int, secret: int, low: int, high: int):
+    """Return a closeness label and percentage score for a guess.
+
+    The percentage is normalized to the active range so it stays meaningful
+    across difficulties.
+    """
+    span = max(high - low, 1)
+    distance = abs(int(guess) - int(secret))
+    ratio = distance / span
+    closeness_pct = max(0, round((1 - ratio) * 100))
+
+    if distance == 0:
+        label = "Exact"
+    elif ratio <= 0.05:
+        label = "Very Hot"
+    elif ratio <= 0.15:
+        label = "Warm"
+    elif ratio <= 0.30:
+        label = "Cool"
+    else:
+        label = "Cold"
+
+    return label, closeness_pct
+
+
 def update_score(current_score: int, outcome: str, attempt_number: int):
     """Update score based on outcome and attempt number."""
     raise NotImplementedError("Refactor this function from app.py into logic_utils.py")

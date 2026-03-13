@@ -44,6 +44,9 @@ Using AI streamlined the manual process of creating small unit tests. Sometimes,
 - How would you explain Streamlit "reruns" and session state to a friend who has never used Streamlit?
 - What change did you make that finally gave the game a stable secret number?
 
+The secret number kept changing in the original app because Streamlit reruns the script after every guess. So even within the same round, even if I submit an initial guess, the number would change right after that. Streamlit reruns the entire Python app.py file every single time you open it and during every interaction during that session when you have the browser tab open. Thats why you need to store static data in the session state which stays the same during a single session. To give the app a stable secret number, I generated it randomly and I stored it in st.session_state. 
+
+
 ---
 
 ## 5. Looking ahead: your developer habits
