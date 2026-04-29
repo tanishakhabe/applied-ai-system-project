@@ -241,7 +241,7 @@ if new_game:
     st.session_state.history = []
     st.session_state.guess_history = []
     st.session_state.coach_result = None
-        st.session_state.latest_hint = None
+    st.session_state.latest_hint = None
     st.success("New game started.")
     st.rerun()
 
