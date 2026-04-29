@@ -41,7 +41,7 @@ def render_coach_panel(coach_result: dict | None, guess_input_key: str):
 
     with action_col:
         if coach_result.get("recommended_guess") is not None:
-            if st.button("Use suggestion", key=f"use_coach_guess_{guess_input_key}"):
+            if st.button("AI suggested guess", key=f"use_coach_guess_{guess_input_key}"):
                 st.session_state[guess_input_key] = str(coach_result["recommended_guess"])
                 st.rerun()
 
@@ -57,7 +57,58 @@ def render_coach_panel(coach_result: dict | None, guess_input_key: str):
     with guess_col:
         st.metric("Recommended guess", coach_result.get("recommended_guess", "-"))
 
+
+def render_ui_styles():
+    st.markdown(
+        """
+        <style>
+        .app-shell {
+            padding-top: 0.25rem;
+        }
+        .hero-card {
+            padding: 1rem 1.1rem;
+            border: 1px solid rgba(49, 51, 63, 0.12);
+            border-radius: 1rem;
+            background: linear-gradient(180deg, rgba(248, 249, 252, 0.98), rgba(255, 255, 255, 0.96));
+            margin-bottom: 1rem;
+        }
+        .hero-kicker {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: rgba(49, 51, 63, 0.72);
+            margin-bottom: 0.25rem;
+        }
+        .hero-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin: 0;
+        }
+        .hero-subtitle {
+            margin-top: 0.25rem;
+            color: rgba(49, 51, 63, 0.8);
+        }
+        .section-card {
+            padding: 1rem;
+            border: 1px solid rgba(49, 51, 63, 0.12);
+            border-radius: 1rem;
+            background: white;
+            box-shadow: 0 8px 24px rgba(49, 51, 63, 0.04);
+        }
+        .coach-frame {
+            min-height: 100%;
+        }
+        .coach-empty {
+            color: rgba(49, 51, 63, 0.68);
+            font-size: 0.95rem;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
 st.set_page_config(page_title="Glitchy Guesser", page_icon="🎮")
+render_ui_styles()
 
 st.title("🎮 Game Glitch Investigator")
 st.caption("An AI-generated guessing game. Something is off.")
@@ -125,9 +176,58 @@ st.info(
 
 guess_input_key = f"guess_input_{difficulty}"
 
-with st.expander("AI Coach", expanded=False):
+st.markdown(
+    """
+    <div class="hero-card">
+        <div class="hero-kicker">Round overview</div>
+        <div class="hero-title">Manual guessing stays front and center.</div>
+        <div class="hero-subtitle">Use the input box to play normally, then open the coach if you want help.</div>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
+
+metric_col1, metric_col2, metric_col3 = st.columns(3)
+metric_col1.metric("Difficulty", difficulty)
+metric_col2.metric("Attempts left", attempt_limit - st.session_state.attempts)
+metric_col3.metric("Score", st.session_state.score)
+
+guess_col, coach_col = st.columns([1.15, 0.95], gap="large")
+
+with guess_col:
+    st.markdown(
+        """
+        <div class="section-card">
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+    st.subheader("Make a guess")
+    raw_guess = st.text_input(
+        "Enter your guess",
+        key=guess_input_key,
+        placeholder=f"Type a number between {low} and {high}",
+    )
+
+    action_col1, action_col2, action_col3 = st.columns(3)
+    with action_col1:
+        submit = st.button("Submit Guess 🚀", use_container_width=True)
+    with action_col2:
+        new_game = st.button("New Game 🔁", use_container_width=True)
+    with action_col3:
+        show_hint = st.checkbox("Show hint", value=True)
+
+with coach_col:
+    st.markdown(
+        """
+        <div class="section-card coach-frame">
+            <div class="hero-kicker">AI Coach</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
     st.caption("Ask for advice based on the current visible game state.")
-    if st.button("Analyze current position 🤖", key="ask_ai_coach"):
+    if st.button("Analyze current position 🤖", key="ask_ai_coach", use_container_width=True):
         coach_context = build_coach_context(
             difficulty=difficulty,
             low=low,
@@ -151,11 +251,6 @@ with st.expander("Developer Debug Info"):
     st.write("Difficulty:", difficulty)
     st.write("History:", st.session_state.history)
 
-raw_guess = st.text_input(
-    "Enter your guess:",
-    key=guess_input_key
-)
-
 st.subheader("Guess History")
 if not st.session_state.guess_history:
     st.caption("No guesses yet. Submit one to see how close you are.")
@@ -175,14 +270,6 @@ else:
             f"{entry['closeness_label']} ({entry['closeness_pct']}% close)"
         )
         st.progress(entry["closeness_pct"] / 100)
-
-col1, col2, col3 = st.columns(3)
-with col1:
-    submit = st.button("Submit Guess 🚀")
-with col2:
-    new_game = st.button("New Game 🔁")
-with col3:
-    show_hint = st.checkbox("Show hint", value=True)
 
 if new_game:
     st.session_state.attempts = 0
