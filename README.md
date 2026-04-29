@@ -1,41 +1,128 @@
 # 🎮 Game Glitch Investigator: The Impossible Guesser
 
-## 🚨 The Situation
+## Original Project
 
-You asked an AI to build a simple "Number Guessing Game" using Streamlit.
-It wrote the code, ran away, and now the game is unplayable. 
+The original project from Modules 1-3 was **The Impossible Guesser**, a Streamlit number guessing game. Its original goal was to let the player guess a secret number within a difficulty-based range, receive higher/lower hints, and track progress across attempts. The project originally focused on debugging broken game logic, fixing Streamlit state issues, and making the game testable.
 
-- You can't win.
-- The hints lie to you.
-- The secret number seems to have commitment issues.
+## Title and Summary
 
-## 🛠️ Setup
+This project is a polished number guessing game with an **AI Coach**. It matters because it shows how a small deterministic app can be extended with AI in a useful, bounded way: the game still runs on clear rules, while the coach helps the player think through the next move.
 
-1. Install dependencies: `pip install -r requirements.txt`
-2. Run the broken app: `python -m streamlit run app.py`
+## What It Does
 
-## 🕵️‍♂️ Your Mission
+- Lets the player choose a difficulty level: Easy, Normal, or Hard.
+- Accepts manual number guesses through a text input.
+- Returns hints such as higher/lower and tracks guess history.
+- Calculates score and ends the round on a win or loss.
+- Provides an optional AI Coach that analyzes the visible game state and suggests the next guess.
 
-1. **Play the game.** Open the "Developer Debug Info" tab in the app to see the secret number. Try to win.
-2. **Find the State Bug.** Why does the secret number change every time you click "Submit"? Ask ChatGPT: *"How do I keep a variable from resetting in Streamlit when I click a button?"*
-3. **Fix the Logic.** The hints ("Higher/Lower") are wrong. Fix them.
-4. **Refactor & Test.** - Move the logic into `logic_utils.py`.
-   - Run `pytest` in your terminal.
-   - Keep fixing until all tests pass!
+## Architecture Overview
 
-## 📝 Document Your Experience
+The architecture is split into two main layers:
 
-- [ ] Describe the game's purpose.
-This is a number guessing game with three levels, early, normal, and hard. To play the game, users can enter any whole number within the guessing range, with a certain number of attempts allowed. The user also has the option to see hints to guide them towards the secret number. The app also has a "Guess History" sidebar that visualizes how close your previous guesses were to the secret number.
+- `app.py` handles the Streamlit UI, session state, layout, and user interaction.
+- `logic_utils.py` contains deterministic game rules such as range validation, hint logic, and closeness scoring.
+- `coach_utils.py` builds the AI coach context, generates a recommendation, and falls back to a local heuristic if no API key is available.
+- `tests/test_game_logic.py` verifies the core rules and the coach helper functions.
 
-- [ ] Detail which bugs you found.
-The first bug I found was the the user input was allowing numbers outside of the guessing range, negative numbers, as well as decimal values. Another bug that I found was that when you changed game levels, the number ranges would not match the difficulty of the level. Another bug I found was that the hints were not accurate to the guesses that were inputted. 
+The system diagram in `system_diagram.md` shows the flow from human input to the UI, into the game logic and coach, and back to the player. It also highlights where testing and human review happen. The retriever is shown only as a possible future component; it is not implemented in this project.
 
+## Setup Instructions
 
-- [ ] Explain what fixes you applied.
-I changed the game level ranges to make them match the level of difficulty by making the size of the number range increase as you went from easy, to normal, to hard. I fixed the allowed values for the guess values by applying constraints/checks on the user inputs. I also updated the function logic to give the correct hints by comparing the user input and and secret number after each guess. 
+1. Open the project folder in VS Code or your terminal.
+2. Install dependencies:
 
-## 🤖 AI Coach
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. If you want the LLM-backed coach, set your API key first:
+
+   ```bash
+   export OPENAI_API_KEY="your-key-here"
+   ```
+
+   Optional settings:
+
+   ```bash
+   export OPENAI_MODEL="gpt-4.1-mini"
+   export OPENAI_BASE_URL="https://api.openai.com"
+   ```
+
+4. Run the app:
+
+   ```bash
+   streamlit run app.py
+   ```
+
+5. Run the tests:
+
+   ```bash
+   pytest
+   ```
+
+## Sample Interactions
+
+These examples use the built-in heuristic coach, which is what you get when no API key is configured.
+
+### Example 1: Midgame coaching
+
+- Input: Difficulty = Normal, guesses = `10`, then `40`, then ask for AI help.
+- AI output:
+  - Title: `Coach recommends 25`
+  - Suggestion: `Try 25 next.`
+  - Explanation: The coach narrows the visible range and recommends the midpoint to reduce uncertainty.
+
+### Example 2: Recent low/high feedback
+
+- Input: Difficulty = Easy, guesses = `5` then `15`, then ask for AI help.
+- AI output:
+  - Title: `Coach recommends 10`
+  - Suggestion: `Try 10 next.`
+  - Explanation: The coach infers the remaining range from the prior hints and suggests the midpoint.
+
+### Example 3: Round already solved
+
+- Input: Correct guess submitted, then ask for AI help.
+- AI output:
+  - Title: `Round already solved`
+  - Suggestion: `You already won this round.`
+  - Explanation: Start a new game to use the coach on another puzzle.
+
+## Design Decisions
+
+I built the project this way to keep the game rules deterministic and the AI layer advisory only. That separation makes the app easier to test and prevents the coach from changing the actual outcome of the game.
+
+I chose an agentic coach instead of a retriever or a fine-tuned model because the project is small and the gameplay state is already structured. A retriever would add complexity without much benefit here, and a fine-tuned model would not be justified without a larger labeled dataset.
+
+The main trade-off is that the coach is less powerful than a trained or retrieval-based assistant, but it is far simpler to ship and reason about. The local heuristic fallback also keeps the app usable when no API key is configured.
+
+## Testing Summary
+
+What worked:
+
+- The core game logic tests passed after the logic was separated into `logic_utils.py`.
+- The coach helper tests passed, including state extraction and prompt safety checks.
+- The Streamlit app runs with both the heuristic fallback and the API-based coach path.
+
+What did not work at first:
+
+- I introduced an indentation bug while moving the hint display, which caused a Streamlit compilation error.
+- A prompt test initially failed because it checked for the word `secret` too broadly instead of checking for actual secret leakage.
+
+What I learned:
+
+- Small UI changes in Streamlit can break execution if indentation or state ordering is off.
+- AI features are easier to manage when the visible state is packaged into a single structured context.
+- Tests are useful not just for game rules, but also for validating the boundaries around AI behavior.
+
+## Reflection
+
+This project taught me that AI is most useful when it is constrained by the structure of the problem. The strongest result was not a flashy model, but a clean separation between deterministic game logic, a coach that reasons from visible state, and tests that keep the system honest.
+
+It also reinforced that debugging AI-assisted software is still normal software engineering: state management, UI ordering, and error handling matter just as much as the model call. Overall, the project showed me how to build AI into an app in a way that is practical, testable, and easy to explain.
+
+## AI Coach
 
 This version adds an on-demand AI Coach that looks at the visible game state, recent guesses, and remaining attempts, then suggests the next best guess strategy.
 
@@ -45,14 +132,6 @@ This version adds an on-demand AI Coach that looks at the visible game state, re
 
 To enable the LLM-backed version, set `OPENAI_API_KEY` in your environment before running Streamlit.
 
+## System Diagram
 
-## 📸 Demo
-
-- [ ] [Insert a screenshot of your fixed, winning game here]
-![alt text](final_app.png)
-
-## 🚀 Stretch Features
-
-- [ ] [If you choose to complete Challenge 4, insert a screenshot of your Enhanced Game UI here]
-
-I chose to complete Challenge 2 by adding a Guess History visualization at the bottom of the page. First I basically detailed the feature description and what I wanted the visual to look like, and then had the agent suggest the changes to my code. I iterated on the process by reviewing and accepting the code changes, then running the app and experimenting with different inputs to see how the visualization looked and if there were any bugs. I did run into some bugs initially, for example, it was displaying the wrong Attempt Number. I fixed this problem by pointing it out in the Copilot Chat and asking it to walk through and inspect the function that was handling that logic.
+See [system_diagram.md](system_diagram.md) for the full flow of the player, Streamlit UI, agentic coach, deterministic logic, testing, and human review points.
