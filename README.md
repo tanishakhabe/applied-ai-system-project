@@ -101,14 +101,14 @@ The main trade-off is that the coach is less powerful than a trained or retrieva
 
 What worked:
 
-- The core game logic tests passed after the logic was separated into `logic_utils.py`.
+- The core game logic tests passed after the logic was separated into a separate file `logic_utils.py`.
 - The coach helper tests passed, including state extraction and prompt safety checks.
 - The Streamlit app runs with both the heuristic fallback and the API-based coach path.
 
 What did not work at first:
 
 - I introduced an indentation bug while moving the hint display, which caused a Streamlit compilation error.
-- A prompt test initially failed because it checked for the word `secret` too broadly instead of checking for actual secret leakage.
+- After I initially added the AI Coach feature, the UI got really buggy and cluttered. I had to clean up the UI separately and focus on having two separate components on the screen, the original guess and the AI suggested guess. 
 
 What I learned:
 
@@ -121,17 +121,3 @@ What I learned:
 This project taught me that AI is most useful when it is constrained by the structure of the problem. The strongest result was not a flashy model, but a clean separation between deterministic game logic, a coach that reasons from visible state, and tests that keep the system honest.
 
 It also reinforced that debugging AI-assisted software is still normal software engineering: state management, UI ordering, and error handling matter just as much as the model call. Overall, the project showed me how to build AI into an app in a way that is practical, testable, and easy to explain.
-
-## AI Coach
-
-This version adds an on-demand AI Coach that looks at the visible game state, recent guesses, and remaining attempts, then suggests the next best guess strategy.
-
-- It only uses public round state and guess history.
-- It does not read the secret number.
-- It falls back to a local strategy if an API key is not configured.
-
-To enable the LLM-backed version, set `OPENAI_API_KEY` in your environment before running Streamlit.
-
-## System Diagram
-
-See [system_diagram.md](system_diagram.md) for the full flow of the player, Streamlit UI, agentic coach, deterministic logic, testing, and human review points.

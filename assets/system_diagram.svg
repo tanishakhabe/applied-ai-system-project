@@ -1,0 +1,139 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">AI System Diagram</title>
+  <desc id="desc">Flow of the Streamlit guessing game, agentic coach, deterministic logic, testing, and human review.</desc>
+  <defs>
+    <style>
+      .bg { fill: #f8fafc; }
+      .lane { fill: #ffffff; stroke: #d8dee9; stroke-width: 2; rx: 24; }
+      .card { fill: #ffffff; stroke: #334155; stroke-width: 2.2; rx: 18; }
+      .accent { fill: #eff6ff; stroke: #2563eb; stroke-width: 2.2; rx: 18; }
+      .future { fill: #f8fafc; stroke: #64748b; stroke-width: 2.2; stroke-dasharray: 10 8; rx: 18; }
+      .title { font: 700 28px Inter, Arial, sans-serif; fill: #0f172a; }
+      .subtitle { font: 600 16px Inter, Arial, sans-serif; fill: #334155; }
+      .label { font: 600 18px Inter, Arial, sans-serif; fill: #0f172a; }
+      .small { font: 500 14px Inter, Arial, sans-serif; fill: #475569; }
+      .tiny { font: 500 13px Inter, Arial, sans-serif; fill: #475569; }
+      .arrow { stroke: #334155; stroke-width: 3; fill: none; marker-end: url(#arrowhead); }
+      .dashed { stroke: #64748b; stroke-width: 3; fill: none; stroke-dasharray: 10 8; marker-end: url(#arrowhead-gray); }
+      .muted { fill: #64748b; }
+      .pill { fill: #dbeafe; }
+    </style>
+    <marker id="arrowhead" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M 0 0 L 12 6 L 0 12 z" fill="#334155" />
+    </marker>
+    <marker id="arrowhead-gray" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M 0 0 L 12 6 L 0 12 z" fill="#64748b" />
+    </marker>
+  </defs>
+
+  <rect class="bg" x="0" y="0" width="1600" height="900" />
+  <text class="title" x="60" y="58">AI System Diagram</text>
+  <text class="subtitle" x="60" y="88">Current project flow: agentic coach, deterministic game logic, testing, and human review</text>
+
+  <rect class="lane" x="40" y="120" width="1520" height="500" />
+  <text class="subtitle" x="70" y="155">Runtime path</text>
+
+  <rect class="card" x="70" y="210" width="240" height="110" />
+  <text class="label" x="90" y="245">Human player</text>
+  <text class="small" x="90" y="272">Enters a guess or</text>
+  <text class="small" x="90" y="294">requests coach help</text>
+
+  <rect class="accent" x="360" y="195" width="280" height="140" />
+  <text class="label" x="385" y="230">Streamlit UI</text>
+  <text class="small" x="385" y="258">app.py</text>
+  <text class="small" x="385" y="282">Session state, buttons,</text>
+  <text class="small" x="385" y="304">text input, layout</text>
+
+  <rect class="card" x="700" y="195" width="280" height="140" />
+  <text class="label" x="725" y="230">Game state + history</text>
+  <text class="small" x="725" y="258">Visible guesses, attempts,</text>
+  <text class="small" x="725" y="282">score, difficulty, status</text>
+  <text class="small" x="725" y="304">Structured context only</text>
+
+  <rect class="accent" x="1040" y="175" width="300" height="180" />
+  <text class="label" x="1065" y="210">Agentic coach</text>
+  <text class="small" x="1065" y="238">coach_utils.py</text>
+  <text class="small" x="1065" y="262">Build context, prompt,</text>
+  <text class="small" x="1065" y="284">and recommendation</text>
+  <text class="small" x="1065" y="306">Fallback heuristic if no API</text>
+
+  <rect class="card" x="1380" y="150" width="160" height="90" />
+  <text class="label" x="1398" y="182">LLM model</text>
+  <text class="tiny" x="1398" y="208">Optional API call</text>
+
+  <rect class="card" x="1380" y="275" width="160" height="90" />
+  <text class="label" x="1398" y="307">Heuristic</text>
+  <text class="tiny" x="1398" y="333">Local fallback</text>
+
+  <rect class="card" x="1380" y="410" width="160" height="90" />
+  <text class="label" x="1398" y="442">Parsed output</text>
+  <text class="tiny" x="1398" y="468">title, suggestion,</text>
+  <text class="tiny" x="1398" y="486">recommended guess</text>
+
+  <rect class="card" x="360" y="400" width="280" height="140" />
+  <text class="label" x="385" y="435">Deterministic logic</text>
+  <text class="small" x="385" y="463">logic_utils.py</text>
+  <text class="small" x="385" y="487">Validate input, compute hints,</text>
+  <text class="small" x="385" y="509">score, win/loss, closeness</text>
+
+  <rect class="card" x="70" y="410" width="240" height="140" />
+  <text class="label" x="90" y="445">Result back to player</text>
+  <text class="small" x="90" y="473">Hint / win / lose / score</text>
+  <text class="small" x="90" y="497">Coach advice and suggestions</text>
+  <text class="small" x="90" y="521">Appear in the UI</text>
+
+  <path class="arrow" d="M 310 265 L 360 265" />
+  <path class="arrow" d="M 640 265 L 700 265" />
+  <path class="arrow" d="M 980 265 L 1040 265" />
+  <path class="arrow" d="M 1340 220 L 1380 195" />
+  <path class="arrow" d="M 1340 290 L 1380 320" />
+  <path class="arrow" d="M 1340 320 L 1380 455" />
+  <path class="arrow" d="M 1380 455 L 640 455" />
+  <path class="arrow" d="M 360 470 L 310 470" />
+  <path class="arrow" d="M 620 470 L 700 470" />
+  <path class="arrow" d="M 700 470 L 360 470" />
+  <path class="arrow" d="M 360 470 L 310 470" />
+  <path class="arrow" d="M 310 470 L 190 470" />
+  <path class="arrow" d="M 190 410 L 190 320" />
+  <path class="arrow" d="M 190 550 L 190 630" />
+  <path class="arrow" d="M 190 630 L 560 630" />
+  <path class="arrow" d="M 560 630 L 560 540" />
+  <path class="arrow" d="M 560 540 L 700 540" />
+  <path class="arrow" d="M 700 470 L 760 470" />
+  <path class="arrow" d="M 760 470 L 760 335" />
+  <path class="arrow" d="M 760 335 L 1040 335" />
+  <path class="arrow" d="M 1180 355 L 1180 400" />
+  <path class="arrow" d="M 1180 355 L 1180 400" />
+  <path class="arrow" d="M 1180 355 L 1180 400" />
+
+  <text class="tiny" x="318" y="255">input</text>
+  <text class="tiny" x="646" y="255">visible state</text>
+  <text class="tiny" x="978" y="255">structured context</text>
+  <text class="tiny" x="1330" y="214">optional API</text>
+  <text class="tiny" x="1328" y="285">fallback</text>
+  <text class="tiny" x="1328" y="430">parsed response</text>
+
+  <text class="subtitle" x="70" y="660">Checking and review</text>
+
+  <rect class="card" x="90" y="700" width="280" height="110" />
+  <text class="label" x="112" y="735">pytest tester</text>
+  <text class="small" x="112" y="762">tests/test_game_logic.py</text>
+  <text class="small" x="112" y="786">Verifies logic and coach helpers</text>
+
+  <rect class="card" x="430" y="700" width="300" height="110" />
+  <text class="label" x="452" y="735">Human review</text>
+  <text class="small" x="452" y="762">Checks the UI and coach output</text>
+  <text class="small" x="452" y="786">Confirms advice feels sensible</text>
+
+  <rect class="future" x="780" y="700" width="300" height="110" />
+  <text class="label" x="802" y="735">Retriever</text>
+  <text class="small" x="802" y="762">Not implemented in this project</text>
+  <text class="small" x="802" y="786">Shown as a future extension</text>
+
+  <path class="arrow" d="M 1150 700 L 1150 615" />
+  <path class="arrow" d="M 520 700 L 520 615" />
+  <path class="dashed" d="M 930 700 L 1170 560" />
+  <text class="tiny" x="960" y="675">future</text>
+
+  <text class="small" x="70" y="850">Current system: agentic coach only. No retriever, no fine-tuned model.</text>
+</svg>
