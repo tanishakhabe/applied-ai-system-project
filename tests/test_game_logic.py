@@ -1,5 +1,11 @@
 import pytest
 
+from coach_utils import (
+    build_coach_context,
+    format_coach_prompt,
+    heuristic_coach,
+    infer_bounds_from_history,
+)
 from logic_utils import (
     check_guess,
     get_guess_closeness,
@@ -62,3 +68,65 @@ def test_get_guess_closeness_near_guess_is_hot_or_warm():
     label, pct = get_guess_closeness(48, 50, 1, 50)
     assert label in {"Very Hot", "Warm"}
     assert pct > 90
+
+
+def test_infer_bounds_from_history_narrows_range():
+    guess_history = [
+        {"valid": True, "guess": 20, "outcome": "Too Low"},
+        {"valid": True, "guess": 40, "outcome": "Too High"},
+        {"valid": False, "guess": "abc", "outcome": None},
+    ]
+
+    low, high = infer_bounds_from_history(1, 100, guess_history)
+    assert low == 21
+    assert high == 39
+
+
+def test_build_coach_context_and_prompt_use_visible_state_only():
+    context = build_coach_context(
+        difficulty="Normal",
+        low=1,
+        high=50,
+        attempt_limit=8,
+        attempts=3,
+        score=25,
+        status="playing",
+        history=[10, 20, 30],
+        guess_history=[
+            {"attempt": 1, "guess": 10, "valid": True, "outcome": "Too Low", "closeness_label": "Cool", "closeness_pct": 40},
+            {"attempt": 2, "guess": 40, "valid": True, "outcome": "Too High", "closeness_label": "Warm", "closeness_pct": 80},
+        ],
+    )
+
+    assert context["attempts_left"] == 5
+    assert context["inferred_low"] == 11
+    assert context["inferred_high"] == 39
+    assert context["recommended_guess"] == 25
+
+    prompt = format_coach_prompt(context)
+    assert "secret_number" not in prompt.lower()
+    assert "Normal" in prompt
+    assert "11" in prompt
+    assert "39" in prompt
+
+
+def test_heuristic_coach_recommends_midpoint():
+    context = build_coach_context(
+        difficulty="Easy",
+        low=1,
+        high=20,
+        attempt_limit=6,
+        attempts=4,
+        score=12,
+        status="playing",
+        history=[5, 10, 15],
+        guess_history=[
+            {"attempt": 1, "guess": 5, "valid": True, "outcome": "Too Low", "closeness_label": "Cool", "closeness_pct": 25},
+            {"attempt": 2, "guess": 15, "valid": True, "outcome": "Too High", "closeness_label": "Warm", "closeness_pct": 75},
+        ],
+    )
+
+    advice = heuristic_coach(context)
+    assert advice["mode"] == "heuristic"
+    assert advice["recommended_guess"] == 10
+    assert "10" in advice["suggestion"]

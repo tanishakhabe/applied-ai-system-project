@@ -35,6 +35,16 @@ The first bug I found was the the user input was allowing numbers outside of the
 - [ ] Explain what fixes you applied.
 I changed the game level ranges to make them match the level of difficulty by making the size of the number range increase as you went from easy, to normal, to hard. I fixed the allowed values for the guess values by applying constraints/checks on the user inputs. I also updated the function logic to give the correct hints by comparing the user input and and secret number after each guess. 
 
+## 🤖 AI Coach
+
+This version adds an on-demand AI Coach that looks at the visible game state, recent guesses, and remaining attempts, then suggests the next best guess strategy.
+
+- It only uses public round state and guess history.
+- It does not read the secret number.
+- It falls back to a local strategy if an API key is not configured.
+
+To enable the LLM-backed version, set `OPENAI_API_KEY` in your environment before running Streamlit.
+
 
 ## 📸 Demo
 
