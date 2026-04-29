@@ -166,14 +166,6 @@ if st.session_state.secret < low or st.session_state.secret > high:
     st.session_state.guess_history = []
     st.session_state.coach_result = None
 
-st.subheader("Make a guess")
-
-st.info(
-    # FIX: Removed hardcoded range and attempt info, replaced with dynamic values based on difficulty 
-    f"Guess a number between {low} and {high}. "
-    f"Attempts left: {attempt_limit - st.session_state.attempts}"
-)
-
 guess_input_key = f"guess_input_{difficulty}"
 
 st.markdown(
@@ -195,14 +187,8 @@ metric_col3.metric("Score", st.session_state.score)
 guess_col, coach_col = st.columns([1.15, 0.95], gap="large")
 
 with guess_col:
-    st.markdown(
-        """
-        <div class="section-card">
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
     st.subheader("Make a guess")
+    st.caption(f"Enter any whole number from {low} to {high}.")
     raw_guess = st.text_input(
         "Enter your guess",
         key=guess_input_key,
@@ -218,14 +204,7 @@ with guess_col:
         show_hint = st.checkbox("Show hint", value=True)
 
 with coach_col:
-    st.markdown(
-        """
-        <div class="section-card coach-frame">
-            <div class="hero-kicker">AI Coach</div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
+    st.markdown("### AI Coach")
     st.caption("Ask for advice based on the current visible game state.")
     if st.button("Analyze current position 🤖", key="ask_ai_coach", use_container_width=True):
         coach_context = build_coach_context(
