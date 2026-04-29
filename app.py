@@ -156,6 +156,9 @@ if "guess_history" not in st.session_state:
 if "coach_result" not in st.session_state:
     st.session_state.coach_result = None
 
+if "latest_hint" not in st.session_state:
+    st.session_state.latest_hint = None
+
 # FIX: Ensure the secret number always matches the active difficulty range, and reset game state if it doesn't. This prevents issues when switching difficulties mid-game.
 # Ensure the current secret always matches the active difficulty range.
 if st.session_state.secret < low or st.session_state.secret > high:
@@ -165,6 +168,7 @@ if st.session_state.secret < low or st.session_state.secret > high:
     st.session_state.history = []
     st.session_state.guess_history = []
     st.session_state.coach_result = None
+    st.session_state.latest_hint = None
 
 guess_input_key = f"guess_input_{difficulty}"
 
@@ -230,26 +234,6 @@ with st.expander("Developer Debug Info"):
     st.write("Difficulty:", difficulty)
     st.write("History:", st.session_state.history)
 
-st.subheader("Guess History")
-if not st.session_state.guess_history:
-    st.caption("No guesses yet. Submit one to see how close you are.")
-else:
-    for entry in reversed(st.session_state.guess_history):
-        if not entry["valid"]:
-            st.markdown(
-                f"**Attempt {entry['attempt']}** - `{entry['guess']}`"
-            )
-            st.caption(f"Invalid guess: {entry['error']}")
-            continue
-
-        st.markdown(
-            f"**Attempt {entry['attempt']}** - Guess `{entry['guess']}`"
-        )
-        st.caption(
-            f"{entry['closeness_label']} ({entry['closeness_pct']}% close)"
-        )
-        st.progress(entry["closeness_pct"] / 100)
-
 if new_game:
     st.session_state.attempts = 0
     st.session_state.secret = random.randint(low, high)
@@ -257,6 +241,7 @@ if new_game:
     st.session_state.history = []
     st.session_state.guess_history = []
     st.session_state.coach_result = None
+        st.session_state.latest_hint = None
     st.success("New game started.")
     st.rerun()
 
@@ -274,6 +259,7 @@ if submit:
 
     if not ok:
         st.session_state.history.append(raw_guess)
+        st.session_state.latest_hint = None
         st.session_state.guess_history.append(
             {
                 "attempt": st.session_state.attempts,
@@ -317,7 +303,9 @@ if submit:
         message = message_map.get(outcome)
 
         if show_hint and message:
-            st.warning(message)
+            st.session_state.latest_hint = message
+        else:
+            st.session_state.latest_hint = None
 
         st.session_state.score = update_score(
             current_score=st.session_state.score,
@@ -340,6 +328,29 @@ if submit:
                     f"The secret was {st.session_state.secret}. "
                     f"Score: {st.session_state.score}"
                 )
+
+if st.session_state.latest_hint:
+    st.info(f"Hint: {st.session_state.latest_hint}")
+
+st.subheader("Guess History")
+if not st.session_state.guess_history:
+    st.caption("No guesses yet. Submit one to see how close you are.")
+else:
+    for entry in reversed(st.session_state.guess_history):
+        if not entry["valid"]:
+            st.markdown(
+                f"**Attempt {entry['attempt']}** - `{entry['guess']}`"
+            )
+            st.caption(f"Invalid guess: {entry['error']}")
+            continue
+
+        st.markdown(
+            f"**Attempt {entry['attempt']}** - Guess `{entry['guess']}`"
+        )
+        st.caption(
+            f"{entry['closeness_label']} ({entry['closeness_pct']}% close)"
+        )
+        st.progress(entry["closeness_pct"] / 100)
 
 st.divider()
 st.caption("Built by an AI that claims this code is production-ready.")
