@@ -121,3 +121,5 @@ What I learned:
 This project taught me that AI is most useful when it is constrained by the structure of the problem. The strongest result was not a flashy model, but a clean separation between deterministic game logic, a coach that reasons from visible state, and tests that keep the system honest.
 
 It also reinforced that debugging AI-assisted software is still normal software engineering: state management, UI ordering, and error handling matter just as much as the model call. Overall, the project showed me how to build AI into an app in a way that is practical, testable, and easy to explain.
+
+Loom link: 
